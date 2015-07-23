@@ -2,8 +2,6 @@
 require_once ("functions.php");
 $obj = new MyQueryBuilder;
 
-$a = array('name', 'age');
-
-$obj->select($a)->from('users')->where('city','=','Ульяновск');
-$obj->query();
+$obj->select('name')->from('users')->where('id','=',6);
+$obj->query()->getResult();
 ?>

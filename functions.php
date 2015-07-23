@@ -1,11 +1,18 @@
 <?php
 require_once ("config.php");
+
 class MyQueryBuilder{
+	const CONNNECT_EXCEPTION_FILE = 'exception_connect.txt';
+	const QUERY_EXCEPTION_FILE = 'exception_query.txt';
+	const METHOD_EXCEPTION_FILE = 'exception_method.txt';
 	private $record = '';
+	private $val_array = NULL;
 	public $db;
+	public $STH;
+	
 	public function __construct(){
 		$dsn = 'mysql:host='.HOST.';dbname='.DB_NAME;
-		$file = 'Z:\home\localhost\www\example\exceptions_connect.txt';
+		$file = __DIR__.CONNNECT_EXCEPTION_FILE;
 		try{
 			$this->db = new PDO($dsn,USER,PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 			$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -32,20 +39,24 @@ class MyQueryBuilder{
 		return $this;
 	}
 	public function values ($val){
-		if (strstr($this->record,'INSERT')==false){
-			echo 'Ошибка метода values';
-		}
-		else{
 		if (is_array($val)){
-			if (count ($val)>1){
-				$this->record = $this->record .' VALUES ' .'("' .implode ('", "',$val) .'")';
+			$this->val_array=$val;
+			$count = count ($val);
+			if ($count>1){
+				$str = '';
+				for ($i=0; $i<$count; $i++){
+					$str = $str .'?, ';
+				}
+				$str = substr($str, 0, -2);
+				$this->record = $this->record .' VALUES ' .'(' .$str .')';
 			}
 		}
 		else{
-			$this->record = $this->record .' VALUES ' .'("' .$val .'")';
+			$this->val_array[]=$val;
+			$this->record = $this->record .' VALUES ' .'(' .'?' .')';
 		}
 		return $this;
-		}
+		
 	}
 	public function select($columns){
 		if (is_array($columns)){
@@ -59,7 +70,7 @@ class MyQueryBuilder{
 		return $this;
 	}
 	public function from($table){
-		if ((strstr($this->record,'DELETE')==false)&&(strstr($this->record,'SELECT')==false)){
+		if ((!strstr($this->record,'DELETE'))&&(!strstr($this->record,'SELECT'))){
 			echo 'Ошибка метода from';
 		}
 		else{
@@ -71,58 +82,42 @@ class MyQueryBuilder{
 		$this->record = 'UPDATE ' .$table;
 		return $this;
 	}
-	public function set($what, $val){
-		if (strstr($this->record,'UPDATE')==false){
-			echo 'Ошибка метода offset';
-		}
-		else{
-		if (is_array($what)){
-			$this->record = $this->record . ' SET ';
+	public function set($what){
+		$this->record = $this->record . ' SET ';
+		$this->val_array=array_values($what);
+		if (count($what)>1){
 			foreach ($what as $key=>$value){
-				$this->record = $this->record .$key .' = ' ."'".$value."', ";
+				$this->record = $this->record .$key .' = ' .'?'.', ';
 			}
 			$this->record = substr($this->record, 0, -2);
 		}
 		else{
-			$this->record = $this->record . ' SET ' .$what .' = ' ."'".$val ."'";
+			$this->record = $this->record . ' SET ' .$what .' = ' .'?' ;
 		}
 		return $this;
-		}
 	}
 	public function where($what,$oper,$val){
 		$b = array ("=", ">", "<", ">=", "<=", "<>", "LIKE");
 		$key = array_search ($oper, $b);
 		$oper = $b[$key];
-		if (is_int ($val)){
-				$this->record = $this->record . ' WHERE ' .$what .$oper .$val;	
-			}
-		else {
-			$this->record = $this->record .' WHERE ' .$what .' '.$oper.' '."'".$val."'";
-		}
+		$this->val_array[]= $val;
+		$this->record = $this->record .' WHERE ' .$what .' '.$oper.' '.'?';
 		return $this;		
 	}
 	public function and_where($what,$oper,$val){
 		$b = array ("=", ">", "<", ">=", "<=", "<>", "LIKE");
 		$key = array_search ($oper, $b);
 		$oper = $b[$key];
-		if (is_int ($val)){
-				$this->record = $this->record . ' AND ' .$what .$oper .$val;	
-			}
-		else {
-			$this->record = $this->record .' AND ' .$what .' '.$oper.' '."'".$val."'";
-		}
+		$this->val_array[]= $val;
+		$this->record = $this->record .' AND ' .$what .' '.$oper.' '.'?';
 		return $this;		
 	}
 	public function or_where($what,$oper,$val){
 		$b = array ("=", ">", "<", ">=", "<=", "<>", "LIKE");
 		$key = array_search ($oper, $b);
 		$oper = $b[$key];
-		if (is_int ($val)){
-				$this->record = $this->record . ' OR ' .$what .$oper .$val;	
-			}
-		else {
-			$this->record = $this->record .' OR ' .$what .' '.$oper.' '."'".$val."'";
-		}
+		$this->val_array[]= $val;
+		$this->record = $this->record .' OR ' .$what .' '.$oper.' '.'?';
 		return $this;	
 	}
 	public function limit($limit){
@@ -132,15 +127,14 @@ class MyQueryBuilder{
 	}
 	public function offset ($offset){
 		$offset = intval ($offset);
-		if (strstr($this->record,'LIMIT')==false){
+		if (!strstr($this->record,'LIMIT')){
 			echo 'Ошибка метода offset';
 		}
 		else{
-			$this->record = $this->record ." OFFSET " .$offset;
+			$this->record = $this->record .' OFFSET ' .$offset;
 		}
 		return $this;
 	}
-	//TODO: порядок по умолч
 	public function order ($columns, $por){
 		$orders = array("ASC","DESC");
 		$key = array_search ($por, $orders);
@@ -157,31 +151,14 @@ class MyQueryBuilder{
 	}
 	
 	public function query(){
-	$file = '__DIR__.''Z:\home\localhost\www\example\exceptions_query.txt';
-		//$this->record = $this->db->quote($this->record);
-		try{
-			if (strstr($this->record,'SELECT')==false){
-				$result = $this->db->exec($this->record);
-				echo "Количество затронутых строк = " .$result;
-			}
-			else{
-				$result = $this->db->query ($this->record);
-				while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-					print_r($row);
-				}	
-			}
-			$this->record = '';
-		}
-		catch (PDOException $e){
-			echo "Ошибка выполнения запроса";
-			file_put_contents($file,$e->getMessage()."\r\n",FILE_APPEND);
-		}	
+		$this->STH = $this->db->prepare($this->record);
+		$this->STH->execute($this->val_array);
+		return $this;
 	}	
-		/* 
-		$error_array = $this->db->errorInfo();
-		if($this->db->errorCode() != 0000){
-			echo "SQL ошибка: " . $error_array[2] . '<br />';
-			} */
-
+	public function getResult(){
+		$result = $this->STH->fetchAll();
+		print_r($result);
+	}
+		
 }
 ?>
