@@ -1,0 +1,35 @@
+﻿Отсутствует DELETE или SELECT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 89
+
+Отсутствует DELETE или SELECT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 89
+
+Отсутствует DELETE или SELECT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 98
+
+Отсутствует DELETE или SELECT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 98
+
+Отсутствует DELETE или SELECT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 98
+
+Ошибка записи DELETE
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 40
+
+Отсутствует INSERT
+Code: 0
+File: Z:\home\localhost\www\example\functions.php
+Line: 54
+
