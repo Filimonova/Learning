@@ -44,7 +44,7 @@ class MyQueryBuilder
 * $val_array массив prepared statement 
 * $count_row количество строк затронутых в запросе
 */
-    public $record = '';
+    private $record = '';
     private $val_array = NULL;
 	private $count_row = NULL;
     public $db;
@@ -342,6 +342,7 @@ class MyQueryBuilder
 		    foreach ($what as $key=>$value){
 		        $this->record = $this->record .$key .'.' .$value .', ';
 		    }
+		$this->record = substr($this->record, 0, -2);
 		return $this;
 	}
 /**
@@ -356,7 +357,7 @@ class MyQueryBuilder
 		$joining = array ("INNER", "LEFT", "RIGHT", "FULL", "CROSS");
 		    $key = array_search ($join, $joining);
 		    $join = $joining[$key];
-		$this->record = substr($this->record, 0, -2).' FROM ';
+		$this->record = $this->record .' FROM ';
 		$tmp_line = $tmp_line .' '.$join .' JOIN ';
 		$this->record = $this->record . implode ($tmp_line ,$tables);
 		return $this;
@@ -378,7 +379,6 @@ class MyQueryBuilder
 		        $this->record = $this->record .$key .'.' .'?' .' ' .$oper .' ';
 		    }
 		$this->record = substr($this->record, 0, -2);
-		echo $this->record;
 		return $this;
 	}
 /**
