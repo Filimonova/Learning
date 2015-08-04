@@ -44,7 +44,7 @@ class MyQueryBuilder
 * $val_array массив prepared statement 
 * $count_row количество строк затронутых в запросе
 */
-    private $record = '';
+    public $record = '';
     private $val_array = NULL;
 	private $count_row = NULL;
     public $db;
@@ -335,37 +335,60 @@ class MyQueryBuilder
 /**
 *selectJoin формирование строки запроса с ключевым словом SELECT, используя объединение таблиц JOIN
 *@param $what ассоциативный массив, $key - таблица, $value - значение выборки
-*@param $join содержит ключевое слово условия объединения
-*@param $val ассоциативный массив, $key - таблица, $value - значение для сравнения
-*@param $oper оператор сравнения 
-* $operators "белый список" операторов сравнения
-* $joining "белый список" ключевых слов для объединения
-* $tmp_line временная вспомогательная строка
 */	
-	public function selectJoin($what, $join, $val, $oper)
+	public function selectJoin($what)
 	{
-		$joining = array ("INNER", "LEFT", "RIGHT", "FULL", "CROSS");
-		    $key = array_search ($join, $joining);
-		    $join = $joining[$key];
-		$operators = array ("=", ">", "<", ">=", "<=", "<>");
-		    $key = array_search ($oper, $operators);
-		    $oper = $operators[$key];
 		$this->record = 'SELECT ';
 		    foreach ($what as $key=>$value){
 		        $this->record = $this->record .$key .'.' .$value .', ';
 		    }
+		return $this;
+	}
+/**
+*fromJoin формирование строки запроса с ключевым словом FROM, используя объединение таблиц JOIN
+*@param $tables массив, содержащий таблицы для объединения
+*@param $join содержит ключевое слово условия объединения
+* $joining "белый список" ключевых слов для объединения
+* $tmp_line временная вспомогательная строка
+*/
+	public function fromJoin($tables, $join)
+	{
+		$joining = array ("INNER", "LEFT", "RIGHT", "FULL", "CROSS");
+		    $key = array_search ($join, $joining);
+		    $join = $joining[$key];
 		$this->record = substr($this->record, 0, -2).' FROM ';
-		    foreach ($what as $key=>$value){
-				$tmp_line = $tmp_line .$key .' ' .'!';
-		    }
-		$tmp_line = substr($tmp_line, 0, -2);
-		$tmp_line = str_replace('!', $join .' JOIN ', $tmp_line);	
-		$this->record = $this->record .$tmp_line .' ON ';
-		$this->val_array=array_values($val);
+		$tmp_line = $tmp_line .' '.$join .' JOIN ';
+		$this->record = $this->record . implode ($tmp_line ,$tables);
+		return $this;
+	}
+/**
+*onJoin формирование строки запроса, используя объединение таблиц JOIN и параметр ON
+*@param $val ассоциативный массив, $key - таблица, $value - значение для сравнения
+*@param $oper оператор сравнения 
+* $operators "белый список" операторов сравнения
+*/
+	public function onJoin($val, $oper)
+	{
+		$operators = array ("=", ">", "<", ">=", "<=", "<>");
+		    $key = array_search ($oper, $operators);
+		    $oper = $operators[$key];
+		$this->record = $this->record .' ON ';
+		$this->val_array = array_values($val);
 		    foreach ($val as $key=>$value){
 		        $this->record = $this->record .$key .'.' .'?' .' ' .$oper .' ';
 		    }
 		$this->record = substr($this->record, 0, -2);
+		echo $this->record;
+		return $this;
+	}
+/**
+*usingJoin формирование строки запроса, используя объединение таблиц JOIN и параметр USING
+*@param $value значение для сравнения
+*/
+	public function usingJoin($value)
+	{
+		$this->val_array = $value;
+		$this->record = $this->record .' USING ' .'?';
 	}
 /**
 *query выполнение запроса с подготовленными выражениями

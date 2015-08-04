@@ -25,6 +25,7 @@ $what1 = array ("users"=>"name",
 $join1 = "INNER";
 $val1 = array ("users"=>"id",
               "contacts"=>"id_user");
-$obj->selectJoin($what1, $join1, $val1, '>');
-$obj->query()->getArray();
+$tables = array ('users', 'contacts');
+$obj->selectJoin($what1)->fromJoin($tables, $join1)->onJoin($val1, '>');
+//$obj->query()->getArray();
 ?>
