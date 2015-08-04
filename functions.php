@@ -44,7 +44,7 @@ class MyQueryBuilder
 * $val_array массив prepared statement 
 * $count_row количество строк затронутых в запросе
 */
-    public $record = '';
+    private $record = '';
     private $val_array = NULL;
 	private $count_row = NULL;
     public $db;
@@ -332,7 +332,16 @@ class MyQueryBuilder
 		}
 	    return $this;
 	}
-	
+/**
+*selectJoin формирование строки запроса с ключевым словом SELECT, используя объединение таблиц JOIN
+*@param $what ассоциативный массив, $key - таблица, $value - значение выборки
+*@param $join содержит ключевое слово условия объединения
+*@param $val ассоциативный массив, $key - таблица, $value - значение для сравнения
+*@param $oper оператор сравнения 
+* $operators "белый список" операторов сравнения
+* $joining "белый список" ключевых слов для объединения
+* $tmp_line временная вспомогательная строка
+*/	
 	public function selectJoin($what, $join, $val, $oper)
 	{
 		$joining = array ("INNER", "LEFT", "RIGHT", "FULL", "CROSS");
@@ -357,7 +366,6 @@ class MyQueryBuilder
 		        $this->record = $this->record .$key .'.' .'?' .' ' .$oper .' ';
 		    }
 		$this->record = substr($this->record, 0, -2);
-		echo $this->record;
 	}
 /**
 *query выполнение запроса с подготовленными выражениями
