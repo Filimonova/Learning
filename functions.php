@@ -31,7 +31,7 @@ class MyExceptionQuery extends Exception
     public function __construct($message, $code = 0, Exception $previous = null) 
 	{
 	    parent::__construct($message, $code, $previous);
-		if (WRITE_QUERY_EXCEPTION_FILE == true){
+		if (WRITE_QUERY_EXCEPTION_FILE == 1){
 			$this->writeExceptionFile();
 		}
     }
@@ -53,7 +53,7 @@ class MyExceptionConnect extends Exception
     public function __construct($message, $code = 0, Exception $previous = null) 
 	{
 	    parent::__construct($message, $code, $previous);
-		if (WRITE_CONNECT_EXCEPTION_FILE == true){
+		if (WRITE_CONNECT_EXCEPTION_FILE == 1){
 			$this->writeExceptionFile();
 		}
     }
@@ -77,7 +77,7 @@ class MyQueryBuilder
 * $val_array массив prepared statement 
 * $count_row количество строк затронутых в запросе
 */
-    public $record = '';
+    private $record = '';
     private $val_array = NULL;
 	private $count_row = NULL;
     public $db;
@@ -504,13 +504,6 @@ class MyQueryBuilder
 			throw new MyExceptionQuery ('Не удалось выполнить запрос');
 		}
 	    return $this;
-	}
-	
-	
-
-	public function test(){
-		echo $this->record;
-		
 	}
 }
 ?>
