@@ -33,3 +33,26 @@ Code: 0
 File: Z:\home\localhost\www\example\functions.php
 Line: 54
 
+Невозможно записать WHERE
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 197
+
+Невозможно записать WHERE
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 215
+
+Невозможно записать WHERE
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 218
+
+тест
+
+
+Невозможно записать WHERE
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 217
+

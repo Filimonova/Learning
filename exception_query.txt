@@ -1,0 +1,5 @@
+Исключение при выполнении запроса
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 415
+

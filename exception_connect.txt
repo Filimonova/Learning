@@ -1,0 +1,5 @@
+Не удалось подключиться к базе данных
+Code: 0
+File: D:\OpenServer\domains\example\functions.php
+Line: 93
+

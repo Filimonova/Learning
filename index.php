@@ -1,31 +1,35 @@
 <?php
 require_once ("functions.php");
 
-$obj = new MyQueryBuilder;
-$a = array("age"=>51,
-           "city"=>"Самара",
-           "pol"=>"женский");
     try{ 
-        //$obj->update('users')->set($a)->where('id','=','22');
-	}
-    catch (MyQueryBuilderException $m){
-	    echo 'Возникло исключение при формировании строки запроса',$m->fileExceptionMethod();
-	}
-    catch (Exception $e){
+        $obj = new MyQueryBuilder;
+	} catch (MyExceptionConnect $c){
+	    echo 'Возникло исключение при подключении к базе данных';
+	} catch (Exception $e){
 	    echo 'Возникло исключение другого типа',  $e->getMessage();
 	} 
-	//$obj->query()->getRow();	
-	
-/* $sql_upd = 'UPDATE users SET age = 27 WHERE id = 22';
-$sql_sel = "SELECT name FROM users WHERE pol = 'женский'";
-$obj->rawQuery($sql_upd)->getRow(); */
 
-$what1 = array ("users"=>"name",
-               "contacts"=>"phone");
-$join1 = "INNER";
-$val1 = array ("users"=>"id",
-              "contacts"=>"id_user");
-$tables = array ('users', 'contacts');
-$obj->selectJoin($what1)->fromJoin($tables, $join1)->onJoin($val1, '>');
-//$obj->query()->getArray();
+    try{ 
+        $obj->select('name')->from('users')->where('age','<',40);
+	} catch (MyExceptionMethod $n){
+	    echo 'Возникло исключение при формировании строки запроса';
+	} catch (Exception $e){
+	    echo 'Возникло исключение другого типа',  $e->getMessage();
+	} 
+	
+	try{
+		$obj->query();
+	} catch (MyExceptionQuery $m){
+	    echo 'Возникло исключение при выполнении запроса';
+	} catch (Exception $e){
+	    echo 'Возникло исключение другого типа',  $e->getMessage();
+	} 
+	
+	try{
+		$obj->getRow();
+	} catch (MyExceptionQuery $m){
+	    echo 'Возникло исключение при получении результата запроса';
+	} catch (Exception $e){
+	    echo 'Возникло исключение другого типа',  $e->getMessage();
+	} 
 ?>
